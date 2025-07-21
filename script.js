@@ -33,16 +33,25 @@
           div.appendChild(tooltip);
           div.appendChild(copiedMsg);
 
-          div.onclick = () => {
-            navigator.clipboard.writeText(url).then(() => {
+        div.onclick = () => {
+          navigator.clipboard.writeText(url).then(() => {
+            copiedMsg.classList.add('show');
+            setTimeout(() => {
+              copiedMsg.classList.remove('show');
+            }, 1000);
+          }).catch((err) => {
+            const success = fallbackCopyTextToClipboard(url);
+            if (success) {
               copiedMsg.classList.add('show');
               setTimeout(() => {
                 copiedMsg.classList.remove('show');
               }, 1000);
-            }).catch((err) => {
-              alert('Clipboard copy failed: ' + err);
-            });
-          };
+            } else {
+              alert('Clipboard copy failed: ' + err + '\n\nCopy manually:\n' + url);
+            }
+          });
+        };
+
 
           div.oncontextmenu = (e) => {
             e.preventDefault();
@@ -111,6 +120,27 @@
           closeContextMenu();
         }
       });
+
+    function fallbackCopyTextToClipboard(text) {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          // Avoid scrolling to bottom
+          textArea.style.position = "fixed";
+          textArea.style.top = "-9999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+        
+          let successful = false;
+          try {
+            successful = document.execCommand('copy');
+          } catch (err) {
+            successful = false;
+          }
+          document.body.removeChild(textArea);
+          return successful;
+        }
+
 
       function addEmoji() {
         const title = document.getElementById('titleInput').value.trim();
