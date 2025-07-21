@@ -2,8 +2,6 @@
   if (window.__emojiSidebarInjected) return;
   window.__emojiSidebarInjected = true;
 
-  const GITHUB_URL = 'https://raw.githubusercontent.com/sfjefspj/DiscordCustomEmojis/refs/heads/main/main.html';
-
   const sidebar = document.createElement('div');
   Object.assign(sidebar.style, {
     position: 'fixed',
@@ -14,22 +12,26 @@
     backgroundColor: '#2b2d31',
     zIndex: 999999,
     boxShadow: '2px 0 10px rgba(0,0,0,0.4)',
-    display: 'none',
+    display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
     resize: 'horizontal',
     minWidth: '150px',
-    maxWidth: '80vw'
+    maxWidth: '80vw',
   });
 
+  // iframe loading local main.html in the extension
   const iframe = document.createElement('iframe');
   Object.assign(iframe.style, {
     border: 'none',
     width: '100%',
-    flex: '1'
+    flex: '1',
   });
+  iframe.src = chrome.runtime.getURL('main.html');
+
   sidebar.appendChild(iframe);
 
+  // Close button
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✕';
   Object.assign(closeBtn.style, {
@@ -41,7 +43,7 @@
     color: '#fff',
     fontSize: '20px',
     cursor: 'pointer',
-    zIndex: 1000001
+    zIndex: 1000001,
   });
   closeBtn.title = 'Close Sidebar';
   closeBtn.onclick = () => {
@@ -51,6 +53,7 @@
   };
   sidebar.appendChild(closeBtn);
 
+  // Minimize button
   const minimizeBtn = document.createElement('button');
   minimizeBtn.textContent = '–';
   Object.assign(minimizeBtn.style, {
@@ -62,7 +65,7 @@
     color: '#fff',
     fontSize: '20px',
     cursor: 'pointer',
-    zIndex: 1000001
+    zIndex: 1000001,
   });
   minimizeBtn.title = 'Minimize Sidebar';
   minimizeBtn.onclick = () => {
@@ -71,6 +74,7 @@
   };
   sidebar.appendChild(minimizeBtn);
 
+  // Restore button
   const restoreBtn = document.createElement('button');
   restoreBtn.textContent = '▶';
   Object.assign(restoreBtn.style, {
@@ -89,7 +93,7 @@
     lineHeight: '26px',
     padding: '0',
     zIndex: 1000000,
-    display: 'block'
+    display: 'none',
   });
   restoreBtn.title = 'Restore Sidebar';
   restoreBtn.onclick = () => {
@@ -97,18 +101,6 @@
     restoreBtn.style.display = 'none';
   };
   document.body.appendChild(restoreBtn);
-  document.body.appendChild(sidebar);
 
-  fetch(GITHUB_URL)
-    .then(res => res.text())
-    .then(html => {
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write(html);
-      doc.close();
-    })
-    .catch(err => {
-      alert('Failed to load sidebar HTML: ' + err);
-      console.error(err);
-    });
+  document.body.appendChild(sidebar);
 })();
