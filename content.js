@@ -90,7 +90,7 @@
     cursor: 'pointer',
     fontWeight: 'bold',
     fontSize: '12px',
-    lineHeight: '26px',
+    lineHeight: '20px',
     padding: '0',
     zIndex: 1000000,
     display: 'none',
