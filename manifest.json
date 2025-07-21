@@ -13,13 +13,13 @@
   "content_scripts": [
     {
       "matches": ["https://discord.com/*", "https://*.discord.com/*"],
-      "js": ["content.js"],
+      "js": ["content.js", "script.js"],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["main.html", "icon128.png"],
+      "resources": ["main.html", "icon128.png", "script.js"],
       "matches": ["https://discord.com/*", "https://*.discord.com/*"]
     }
   ]
