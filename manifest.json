@@ -3,7 +3,7 @@
   "name": "Discord Custom Emoji Sidebar",
   "version": "1.0",
   "description": "Injects a custom emoji sidebar into Discord.",
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["scripting", "activeTab", "storage", "clipboardWrite"],
   "host_permissions": ["https://discord.com/*", "https://*.discord.com/*"],
   "action": {
     "default_icon": {
@@ -13,13 +13,13 @@
   "content_scripts": [
     {
       "matches": ["https://discord.com/*", "https://*.discord.com/*"],
-      "js": ["content.js", "script.js"],
+      "js": ["content.js"],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["main.html", "icon128.png", "script.js"],
+      "resources": ["main.html", "icon128.png"],
       "matches": ["https://discord.com/*", "https://*.discord.com/*"]
     }
   ]
