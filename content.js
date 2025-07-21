@@ -41,9 +41,14 @@
     backgroundColor: 'transparent',
     border: 'none',
     color: '#fff',
-    fontSize: '15px',
+    fontSize: '13px',     // smaller font
+    width: '24px',        // fixed size
+    height: '24px',
+    lineHeight: '24px',
     cursor: 'pointer',
     zIndex: 1000001,
+    padding: '0',
+    textAlign: 'center',
   });
   closeBtn.title = 'Close Sidebar';
   closeBtn.onclick = () => {
@@ -63,9 +68,14 @@
     backgroundColor: 'transparent',
     border: 'none',
     color: '#fff',
-    fontSize: '17px',
+    fontSize: '13px',    // smaller font, same as closeBtn
+    width: '24px',       // fixed size same as closeBtn
+    height: '24px',
+    lineHeight: '24px',
     cursor: 'pointer',
     zIndex: 1000001,
+    padding: '0',
+    textAlign: 'center',
   });
   minimizeBtn.title = 'Minimize Sidebar';
   minimizeBtn.onclick = () => {
@@ -81,19 +91,20 @@
     position: 'fixed',
     top: '10px',
     left: '10px',
-    width: '20px',
-    height: '20px',
+    width: '24px',
+    height: '24px',
     backgroundColor: '#5865f2',
     border: 'none',
     borderRadius: '3px',
     color: '#fff',
     cursor: 'pointer',
     fontWeight: 'bold',
-    fontSize: '12px',
-    lineHeight: '20px',
+    fontSize: '14px',
+    lineHeight: '24px',
     padding: '0',
     zIndex: 1000000,
     display: 'none',
+    textAlign: 'center',
   });
   restoreBtn.title = 'Restore Sidebar';
   restoreBtn.onclick = () => {
