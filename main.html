@@ -43,12 +43,12 @@
       grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
       gap: 1px;
       overflow-y: auto;
-    
       flex: 1;            /* fill remaining vertical space */
       padding: 0;
       font-size: 0;
-      /* added */
       min-height: 0;      /* fix for Firefox flexbox bug */
+      align-content: start;
+      row-gap: 4px; /* control vertical spacing, reduce gap */
     }
 
     .emoji {
