@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Discord Emoji Sidebar",
+  "version": "1.0",
+  "description": "Injects a custom emoji sidebar into Discord.",
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://discord.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://raw.githubusercontent.com/*"
+  ]
+}
