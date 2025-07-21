@@ -33,6 +33,10 @@
       gap: 4px;         /* spacing between emojis horizontally and vertically */
       padding: 0;
       margin: 0;
+      font-size: 0;         /* Remove inline spacing between inline-block elements */
+      line-height: 0;       /* Prevent extra vertical gaps */
+      overflow-y: auto;
+      max-height: 100%;     /* allow scrolling if needed */
     }
     
     /* Footer fixed height and no flex-grow */
@@ -48,18 +52,17 @@
 
     
     .emoji {
+      display: inline-block;
       width: 48px;
       height: 48px;
+      margin: 2px 2px 0 0;  /* horizontal and top margin, no bottom margin */
       background-color: #313338;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
       position: relative;
       box-sizing: border-box;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
+      vertical-align: top;  /* Align top to prevent vertical gaps */
+      font-size: 14px;      /* reset font size */
     }
     
     .emoji:hover {
