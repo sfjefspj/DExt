@@ -5,71 +5,72 @@
   <meta charset="UTF-8" />
   <title>Emoji Picker Style Sidebar</title>
   <style>
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
       background: #2b2d31;
       font-family: sans-serif;
       color: white;
     }
-    
+
     .container {
-      max-width: 320px;
-      margin: 0 auto;
-      height: 100vh;           /* full viewport height */
-      display: flex;
-      flex-direction: column;
       padding: 10px;
-      box-sizing: border-box;
-    }
-    
-    /* Fix emoji spacing: Use inline-block or flex-wrap with consistent gaps */
-    
-    .grid {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;         /* spacing between emojis horizontally and vertically */
-      padding: 0;
-      margin: 0;
-      font-size: 0;         /* Remove inline spacing between inline-block elements */
-      line-height: 0;       /* Prevent extra vertical gaps */
-      overflow-y: auto;
-      max-height: 100%;     /* allow scrolling if needed */
-    }
-    
-    /* Footer fixed height and no flex-grow */
-    .footer {
-      flex-shrink: 0;          /* prevent shrinking */
-      padding-top: 10px;
-      border-top: 1px solid #444;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      background: #2b2d31;
+      height: 100vh;
+      box-sizing: border-box;
+      max-width: 320px;
+      margin: auto;
+    
+      /* NEW */
+      /* Make container use full height and allow flex children */
+    }
+ 
+    #searchInput {
+      width: 100%;
+      max-width: 300px;
+      padding: 6px;
+      margin-bottom: 8px;  /* space below search bar */
+      background: #1e1f22;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 14px;
+      box-sizing: border-box;
     }
 
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+      gap: 1px;
+      overflow-y: auto;
     
+      flex: 1;            /* fill remaining vertical space */
+      padding: 0;
+      font-size: 0;
+      /* added */
+      min-height: 0;      /* fix for Firefox flexbox bug */
+    }
+
     .emoji {
-      display: inline-block;
       width: 48px;
       height: 48px;
-      margin: 2px 2px 0 0;  /* horizontal and top margin, no bottom margin */
+      margin: 0;
+      box-sizing: border-box;
       background-color: #313338;
       border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
+      transition: background 0.2s;
       position: relative;
-      box-sizing: border-box;
-      vertical-align: top;  /* Align top to prevent vertical gaps */
-      font-size: 14px;      /* reset font size */
+      font-size: 0; /* fixes inline emoji spacing */
     }
-    
+
     .emoji:hover {
       background-color: #404249;
     }
-    
-    /* Emoji images */
+
     .emoji img {
       width: 40px;
       height: 40px;
@@ -77,37 +78,14 @@
       pointer-events: none;
       display: block;
       margin: 0;
-    }
-    
-    /* Search input styling */
-    #searchInput {
-      width: 100%;
-      max-width: 320px;
-      padding: 8px 10px;
-      margin-bottom: 10px;
-      font-size: 14px;
-      border-radius: 6px;
+      padding: 0;
       border: none;
-      background: #1e1f22;
-      color: white;
-      box-sizing: border-box;
-      outline: none;
-      transition: background 0.2s ease;
     }
-    
-    #searchInput::placeholder {
-      color: #888;
-    }
-    
-    #searchInput:focus {
-      background: #2f3136;
-      box-shadow: 0 0 5px #5865f2;
-    }
-    
-    /* Tooltip */
+
+
     .tooltip {
       position: absolute;
-      bottom: 110%;
+      bottom: 110%;       /* slightly above emoji */
       left: 50%;
       transform: translateX(-50%);
       background: #111;
@@ -121,24 +99,27 @@
       pointer-events: none;
       user-select: none;
       z-index: 5;
-    }
     
+      /* Speech bubble arrow */
+      /* small downward-pointing triangle centered below */
+    }
     .tooltip::after {
       content: "";
       position: absolute;
-      top: 100%;
+      top: 100%;          /* just below the bubble */
       left: 50%;
       transform: translateX(-50%);
       border-width: 6px;
       border-style: solid;
       border-color: #111 transparent transparent transparent;
     }
-    
+
+
     .emoji:hover .tooltip {
       opacity: 1;
     }
-    
-    /* Copy feedback overlay */
+
+    /* Copied overlay */
     .copied-message {
       position: absolute;
       inset: 0;
@@ -156,13 +137,25 @@
       user-select: none;
       z-index: 10;
     }
-    
+
     .copied-message.show {
       opacity: 1;
       pointer-events: auto;
     }
+
+    .footer {
+      padding-top: 10px;
+      border-top: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     
-    /* Inputs and buttons */
+      /* Make footer sticky at bottom */
+      flex-shrink: 0;
+      background: #2b2d31; /* keep background so it covers grid behind when scrolled */
+      z-index: 10;
+    }
+
     .footer input,
     .footer button {
       width: 100%;
@@ -174,26 +167,26 @@
       color: white;
       font-size: 14px;
     }
-    
+
     .footer button {
       background: #5865f2;
       font-weight: bold;
       cursor: pointer;
     }
-    
+
     .footer button:hover {
       background: #4752c4;
     }
-    
+
     .import-export {
       display: flex;
       gap: 6px;
     }
-    
+
     .import-export button {
       flex: 1;
     }
-    
+
     /* Custom context menu */
     .custom-context-menu {
       position: absolute;
@@ -208,46 +201,47 @@
       width: 100px;
       user-select: none;
     }
-    
+
     .custom-context-menu button {
       background: transparent;
       border: none;
       color: white;
-      padding: 4px 8px;
+      padding: 4px 8px; /* smaller padding */
       text-align: left;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 13px; /* slightly smaller font */
       transition: background 0.2s;
     }
-    
+
     .custom-context-menu button:hover {
       background: #444;
     }
-
   </style>
 </head>
 <body>
-  <div class="container">
-    <input type="text" id="searchInput" placeholder="Search emojis..." />
-    <div class="grid" id="emojiGrid"></div>
+<div class="container">
+  <!-- Search input added here -->
+  <input type="text" id="searchInput" placeholder="Search emojis..." />
 
-    <div class="footer">
-      <input type="text" id="titleInput" placeholder="Title" />
-      <input type="text" id="urlInput" placeholder="Image URL" />
-      <button id="addBtn">Add Image</button>
+  <div class="grid" id="emojiGrid"></div>
 
-      <div class="import-export">
-        <button id="exportBtn">Export</button>
-        <button id="importBtn">Import</button>
-        <input
-          type="file"
-          id="importFile"
-          accept="application/json"
-          style="display: none"
-        />
-      </div>
+  <div class="footer">
+    <input type="text" id="titleInput" placeholder="Title" />
+    <input type="text" id="urlInput" placeholder="Image URL" />
+    <button id="addBtn">Add Image</button>
+
+    <div class="import-export">
+      <button id="exportBtn">Export</button>
+      <button id="importBtn">Import</button>
+      <input
+        type="file"
+        id="importFile"
+        accept="application/json"
+        style="display: none"
+      />
     </div>
   </div>
+</div>
 
   <script src="script.js"></script>
 </body>
