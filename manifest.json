@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Discord Emoji Sidebar",
+  "description": "Injects a custom emoji sidebar on Discord.",
   "version": "1.0",
-  "description": "Injects a custom emoji sidebar into Discord.",
   "icons": {
-    "128": "icon.png"
+    "128": "icon128.png"
   },
+  "permissions": ["scripting"],
+  "host_permissions": ["https://discord.com/*"],
   "content_scripts": [
     {
       "matches": ["https://discord.com/*"],
@@ -13,10 +15,8 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": [
-    "scripting"
-  ],
-  "host_permissions": [
-    "https://raw.githubusercontent.com/*"
-  ]
+  "web_accessible_resources": [{
+    "resources": ["icon128.png"],
+    "matches": ["<all_urls>"]
+  }]
 }
