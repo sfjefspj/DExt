@@ -23,12 +23,14 @@
       box-sizing: border-box;
     }
     
+    /* Fix emoji spacing: Use inline-block or flex-wrap with consistent gaps */
+    
     .grid {
-      flex: 1 1 auto;          /* grow and shrink, take available space */
-      overflow-y: auto;        /* scroll if content overflows */
+      flex: 1 1 auto;
+      overflow-y: auto;
       display: flex;
       flex-wrap: wrap;
-      gap: 4px;
+      gap: 4px;         /* spacing between emojis horizontally and vertically */
       padding: 0;
       margin: 0;
     }
@@ -45,7 +47,6 @@
     }
 
     
-    /* Emoji item styling */
     .emoji {
       width: 48px;
       height: 48px;
@@ -56,20 +57,48 @@
       position: relative;
       box-sizing: border-box;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      user-select: none;
     }
     
     .emoji:hover {
       background-color: #404249;
     }
     
+    /* Emoji images */
     .emoji img {
       width: 40px;
       height: 40px;
       object-fit: contain;
       pointer-events: none;
       display: block;
+      margin: 0;
+    }
+    
+    /* Search input styling */
+    #searchInput {
+      width: 100%;
+      max-width: 320px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      background: #1e1f22;
+      color: white;
+      box-sizing: border-box;
+      outline: none;
+      transition: background 0.2s ease;
+    }
+    
+    #searchInput::placeholder {
+      color: #888;
+    }
+    
+    #searchInput:focus {
+      background: #2f3136;
+      box-shadow: 0 0 5px #5865f2;
     }
     
     /* Tooltip */
