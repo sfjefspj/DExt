@@ -35,7 +35,6 @@
     .emoji {
       width: 48px;
       height: 48px;
-      padding: 1px;
       margin: 0;
       box-sizing: border-box;
       background-color: #313338;
@@ -46,7 +45,7 @@
       cursor: pointer;
       transition: background 0.2s;
       position: relative;
-      font-size: 14px; /* reset font-size */
+      font-size: 0; /* fixes inline emoji spacing */
     }
 
     .emoji:hover {
@@ -58,11 +57,12 @@
       height: 40px;
       object-fit: contain;
       pointer-events: none;
-      display: block; /* remove inline image whitespace */
+      display: block;
       margin: 0;
       padding: 0;
       border: none;
     }
+
 
     .tooltip {
       position: absolute;
