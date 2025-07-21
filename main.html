@@ -5,66 +5,77 @@
   <meta charset="UTF-8" />
   <title>Emoji Picker Style Sidebar</title>
   <style>
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
       background: #2b2d31;
       font-family: sans-serif;
       color: white;
     }
-
+    
     .container {
-      padding: 10px;
+      max-width: 320px;
+      margin: 0 auto;
+      height: 100vh;           /* full viewport height */
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      padding: 10px;
       box-sizing: border-box;
-      max-width: 320px;
-      margin: auto;
-    }
-
-    .grid {
-      padding: 0;
-      margin: 0;
-      overflow-y: auto;
-      flex: none;
-      font-size: 0; /* Removes inline spacing */
-      line-height: 0;
     }
     
+    .grid {
+      flex: 1 1 auto;          /* grow and shrink, take available space */
+      overflow-y: auto;        /* scroll if content overflows */
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 0;
+      margin: 0;
+    }
+    
+    /* Footer fixed height and no flex-grow */
+    .footer {
+      flex-shrink: 0;          /* prevent shrinking */
+      padding-top: 10px;
+      border-top: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #2b2d31;
+    }
+
+    
+    /* Emoji item styling */
     .emoji {
-      display: inline-block;
       width: 48px;
       height: 48px;
-      margin: 2px; /* spacing between items */
       background-color: #313338;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
-      vertical-align: top;
       position: relative;
       box-sizing: border-box;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
-
+    
     .emoji:hover {
       background-color: #404249;
     }
-
+    
     .emoji img {
       width: 40px;
       height: 40px;
       object-fit: contain;
       pointer-events: none;
       display: block;
-      margin: auto;
     }
-
-
-
+    
+    /* Tooltip */
     .tooltip {
       position: absolute;
-      bottom: 110%;       /* slightly above emoji */
+      bottom: 110%;
       left: 50%;
       transform: translateX(-50%);
       background: #111;
@@ -78,27 +89,24 @@
       pointer-events: none;
       user-select: none;
       z-index: 5;
-    
-      /* Speech bubble arrow */
-      /* small downward-pointing triangle centered below */
     }
+    
     .tooltip::after {
       content: "";
       position: absolute;
-      top: 100%;          /* just below the bubble */
+      top: 100%;
       left: 50%;
       transform: translateX(-50%);
       border-width: 6px;
       border-style: solid;
       border-color: #111 transparent transparent transparent;
     }
-
-
+    
     .emoji:hover .tooltip {
       opacity: 1;
     }
-
-    /* Copied overlay */
+    
+    /* Copy feedback overlay */
     .copied-message {
       position: absolute;
       inset: 0;
@@ -116,20 +124,13 @@
       user-select: none;
       z-index: 10;
     }
-
+    
     .copied-message.show {
       opacity: 1;
       pointer-events: auto;
     }
-
-    .footer {
-      padding-top: 10px;
-      border-top: 1px solid #444;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
+    
+    /* Inputs and buttons */
     .footer input,
     .footer button {
       width: 100%;
@@ -141,26 +142,26 @@
       color: white;
       font-size: 14px;
     }
-
+    
     .footer button {
       background: #5865f2;
       font-weight: bold;
       cursor: pointer;
     }
-
+    
     .footer button:hover {
       background: #4752c4;
     }
-
+    
     .import-export {
       display: flex;
       gap: 6px;
     }
-
+    
     .import-export button {
       flex: 1;
     }
-
+    
     /* Custom context menu */
     .custom-context-menu {
       position: absolute;
@@ -175,21 +176,22 @@
       width: 100px;
       user-select: none;
     }
-
+    
     .custom-context-menu button {
       background: transparent;
       border: none;
       color: white;
-      padding: 4px 8px; /* smaller padding */
+      padding: 4px 8px;
       text-align: left;
       cursor: pointer;
-      font-size: 13px; /* slightly smaller font */
+      font-size: 13px;
       transition: background 0.2s;
     }
-
+    
     .custom-context-menu button:hover {
       background: #444;
     }
+
   </style>
 </head>
 <body>
