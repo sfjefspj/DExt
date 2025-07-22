@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let dragSrcIndex = null;
   let placeholder = null;
 
+  // Close context menu helper
   function closeContextMenu() {
     if (contextMenuDiv) {
       contextMenuDiv.remove();
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Autosend toggle setup
   const autosendToggle = document.getElementById('autosendToggle');
   if (autosendToggle) {
     autosendToggle.checked = autosendEnabled;
@@ -23,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Render emojis with optional search filter
   function renderEmojis(filter = '') {
     grid.innerHTML = '';
     const filtered = emojis.filter(({ title }) =>
@@ -51,10 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       div.draggable = true;
 
+      // Drag start event
       div.addEventListener('dragstart', (e) => {
         dragSrcIndex = index;
         e.dataTransfer.effectAllowed = 'move';
-        // Transparent drag image to avoid default ghost
+
+        // Transparent drag image to hide default ghost
         const crt = document.createElement('canvas');
         crt.width = crt.height = 0;
         e.dataTransfer.setDragImage(crt, 0, 0);
@@ -68,60 +73,37 @@ document.addEventListener('DOMContentLoaded', () => {
         div.classList.add('dragging');
       });
 
+      // Drag end event
       div.addEventListener('dragend', () => {
         if (placeholder) placeholder.remove();
         placeholder = null;
-
         div.classList.remove('dragging');
-
-        // Save after drag end (emojis array updated on drop)
-        localStorage.setItem('emojiList', JSON.stringify(emojis));
         dragSrcIndex = null;
       });
 
-      div.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        if (!placeholder) return;
-        const bounding = div.getBoundingClientRect();
-        const offset = e.clientY - bounding.top;
-
-        const insertBefore = offset < bounding.height / 2;
-
-        if (insertBefore) {
-          if (grid.contains(placeholder) && placeholder.nextSibling !== div) {
-            grid.insertBefore(placeholder, div);
-          }
-        } else {
-          if (grid.contains(placeholder) && placeholder.nextSibling !== div.nextSibling) {
-            grid.insertBefore(placeholder, div.nextSibling);
-          }
-        }
-      });
-
+      // Click to copy or autosend
       div.onclick = () => {
-        const autoSend = autosendEnabled;
-
-        if (autoSend) {
+        if (autosendEnabled) {
           window.parent.postMessage({
             type: 'insertEmojiUrl',
-            url: url
+            url: url,
           }, '*');
         } else {
           navigator.clipboard.writeText(url).then(() => {
             copiedMsg.classList.add('show');
             setTimeout(() => copiedMsg.classList.remove('show'), 1000);
-          }).catch((err) => {
-            const success = fallbackCopyTextToClipboard(url);
-            if (success) {
+          }).catch(() => {
+            if (fallbackCopyTextToClipboard(url)) {
               copiedMsg.classList.add('show');
               setTimeout(() => copiedMsg.classList.remove('show'), 1000);
             } else {
-              alert('Clipboard copy failed: ' + err + '\n\nCopy manually:\n' + url);
+              alert('Failed to copy URL, please copy manually:\n' + url);
             }
           });
         }
       };
 
+      // Context menu for edit/delete
       div.oncontextmenu = (e) => {
         e.preventDefault();
         closeContextMenu();
@@ -173,24 +155,48 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.appendChild(div);
     });
 
-    // Save emojis every time you render
     localStorage.setItem('emojiList', JSON.stringify(emojis));
   }
 
-  // NEW: Single drop listener outside render loop
+  // Dragover event on grid to move placeholder depending on mouse position
+  grid.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (!placeholder) return;
+
+    const mouseY = e.clientY;
+    const allChildren = Array.from(grid.children);
+
+    // Find first child where mouse is above its center
+    let insertBeforeNode = null;
+    for (const child of allChildren) {
+      if (child === placeholder) continue;
+      const rect = child.getBoundingClientRect();
+      if (mouseY < rect.top + rect.height / 2) {
+        insertBeforeNode = child;
+        break;
+      }
+    }
+
+    if (insertBeforeNode) {
+      if (placeholder.nextSibling !== insertBeforeNode) {
+        grid.insertBefore(placeholder, insertBeforeNode);
+      }
+    } else {
+      grid.appendChild(placeholder);
+    }
+  });
+
+  // Drop event on grid to reorder emojis array and re-render
   grid.addEventListener('drop', (e) => {
     e.preventDefault();
     if (dragSrcIndex === null || !placeholder) return;
 
-    // All children including placeholder
     const allChildren = Array.from(grid.children);
-    // Emoji elements without placeholder
-    const emojiElements = allChildren.filter(el => !el.classList.contains('placeholder'));
-
-    // placeholder index among all children
     const placeholderIndex = allChildren.indexOf(placeholder);
 
-    // Calculate new index in emojis array based on placeholder position
+    // Emoji divs excluding placeholder
+    const emojiElements = allChildren.filter(el => !el.classList.contains('placeholder'));
+
     let newIndex = 0;
     for (let i = 0; i < emojiElements.length; i++) {
       if (allChildren.indexOf(emojiElements[i]) < placeholderIndex) {
@@ -200,27 +206,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Reorder emojis array
+    // Move emoji in data array
     const movedEmoji = emojis.splice(dragSrcIndex, 1)[0];
     emojis.splice(newIndex, 0, movedEmoji);
 
+    // Cleanup
     dragSrcIndex = null;
     placeholder.remove();
     placeholder = null;
 
+    // Re-render and save
     renderEmojis(searchInput.value);
   });
 
+  // Close context menu on outside click
   document.addEventListener('click', (e) => {
     if (contextMenuDiv && !contextMenuDiv.contains(e.target)) {
       closeContextMenu();
     }
   });
 
+  // Close context menu on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeContextMenu();
   });
 
+  // Fallback copy to clipboard method
   function fallbackCopyTextToClipboard(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
@@ -240,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return successful;
   }
 
+  // Add emoji from inputs
   function addEmoji() {
     const title = document.getElementById('titleInput').value.trim();
     const url = document.getElementById('urlInput').value.trim();
@@ -250,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('urlInput').value = '';
   }
 
+  // Export emoji list JSON
   function exportData() {
     const blob = new Blob([JSON.stringify(emojis, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -260,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     URL.revokeObjectURL(url);
   }
 
+  // Import emojis JSON from file
   function importFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -275,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsText(file);
   }
 
+  // Event listeners for buttons and inputs
   document.getElementById('addBtn').addEventListener('click', addEmoji);
   document.getElementById('exportBtn').addEventListener('click', exportData);
   document.getElementById('importBtn').addEventListener('click', () => {
@@ -284,5 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   searchInput.addEventListener('input', () => renderEmojis(searchInput.value));
 
+  // Initial render
   renderEmojis();
 });
