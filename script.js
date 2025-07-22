@@ -162,21 +162,22 @@ document.addEventListener('DOMContentLoaded', () => {
   grid.addEventListener('dragover', (e) => {
     e.preventDefault();
     if (!placeholder) return;
-
+  
     const mouseY = e.clientY;
-    const allChildren = Array.from(grid.children);
-
-    // Find first child where mouse is above its center
+    const allChildren = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
+  
     let insertBeforeNode = null;
-    for (const child of allChildren) {
-      if (child === placeholder) continue;
+  
+    for (let i = 0; i < allChildren.length; i++) {
+      const child = allChildren[i];
       const rect = child.getBoundingClientRect();
+  
       if (mouseY < rect.top + rect.height / 2) {
         insertBeforeNode = child;
         break;
       }
     }
-
+  
     if (insertBeforeNode) {
       if (placeholder.nextSibling !== insertBeforeNode) {
         grid.insertBefore(placeholder, insertBeforeNode);
