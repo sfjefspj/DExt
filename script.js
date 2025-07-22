@@ -266,41 +266,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   grid.addEventListener('drop', (e) => {
-  e.preventDefault();
-  if (dragSrcIndex === null || !placeholder) return;
-
-  // Collect only emoji div children (exclude placeholder)
-  const emojiChildren = Array.from(grid.children).filter(child => !child.classList.contains('placeholder'));
-
-  // Find placeholder position by checking where it would go
-  // The placeholder is currently in the DOM, so find its index in grid.children
-  // The idea: The placeholder is in the DOM, so get the index where it sits.
-
-  // We must find the index in emojiChildren that placeholder is before or after.
-  // But placeholder is NOT in emojiChildren. So get its index in grid.children:
-  const children = Array.from(grid.children);
-  const placeholderIndex = children.indexOf(placeholder);
-
-  // Count how many emojiChildren come before placeholder in children:
-  let newIndex = 0;
-  for (let i = 0; i < emojiChildren.length; i++) {
-    if (children.indexOf(emojiChildren[i]) < placeholderIndex) {
-      newIndex++;
-    } else {
-      break;
+    e.preventDefault();
+    if (dragSrcIndex === null || !placeholder) return;
+  
+    // Get array of emoji elements excluding the placeholder
+    const emojiElements = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
+  
+    // Find placeholder's position in grid.children
+    const allChildren = Array.from(grid.children);
+    const placeholderIndex = allChildren.indexOf(placeholder);
+  
+    // Calculate new index in emojis array for insertion:
+    let newIndex = 0;
+    for (let i = 0; i < emojiElements.length; i++) {
+      if (allChildren.indexOf(emojiElements[i]) < placeholderIndex) {
+        newIndex++;
+      } else {
+        break;
+      }
     }
-  }
+  
+    // Remove the dragged emoji from old position and insert at new index
+    const movedEmoji = emojis.splice(dragSrcIndex, 1)[0];
+    emojis.splice(newIndex, 0, movedEmoji);
+  
+    // Cleanup drag state
+    dragSrcIndex = null;
+    placeholder.remove();
+    placeholder = null;
+  
+    // Re-render emojis in new order (this also saves to localStorage)
+    renderEmojis(searchInput.value);
+  });
 
-  // Remove the dragged emoji from its old position and insert at newIndex
-  const moved = emojis.splice(dragSrcIndex, 1)[0];
-  emojis.splice(newIndex, 0, moved);
-
-  dragSrcIndex = null;
-  placeholder.remove();
-  placeholder = null;
-
-  renderEmojis(searchInput.value);
-});
 
   document.getElementById('addBtn').addEventListener('click', addEmoji);
   document.getElementById('exportBtn').addEventListener('click', exportData);
