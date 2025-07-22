@@ -114,4 +114,33 @@
   document.body.appendChild(restoreBtn);
 
   document.body.appendChild(sidebar);
+
+  window.addEventListener("message", (event) => {
+  if (event.data?.type === "insertEmojiUrl") {
+    const url = event.data.url;
+    const inputBox = document.querySelector('[contenteditable="true"][data-slate-editor="true"]');
+    if (!inputBox) return;
+
+    inputBox.focus();
+
+    const insertEvent = new InputEvent("beforeinput", {
+      inputType: "insertText",
+      data: url,
+      bubbles: true,
+      cancelable: true
+    });
+    inputBox.dispatchEvent(insertEvent);
+
+    // Optionally press Enter to send
+    const enter = new KeyboardEvent("keydown", {
+      key: "Enter",
+      code: "Enter",
+      keyCode: 13,
+      which: 13,
+      bubbles: true
+    });
+    inputBox.dispatchEvent(enter);
+  }
+});
+
 })();
