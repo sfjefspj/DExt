@@ -16,10 +16,7 @@ A Chrome extension that injects a customizable emoji sidebar into Discord. Easil
 
 3. **Open Chrome Extensions Page**
 
-   Open Chrome and go to:
-
-`chrome://extensions/`
-
+   Open Chrome and go to: `chrome://extensions/`
 
 4. **Enable Developer Mode**
 
