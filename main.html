@@ -216,6 +216,51 @@
     .custom-context-menu button:hover {
       background: #444;
     }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #555;
+      border-radius: 34px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: 0.3s;
+    }
+    
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    
+    .switch input:checked + .slider {
+      background-color: #5865f2;
+    }
+    
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
   </style>
 </head>
 <body>
@@ -241,10 +286,14 @@
       />
     </div>
 
-    <label style="color: white; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-      <input type="checkbox" id="autosendToggle" style="accent-color: #5865f2;" />
-      Auto-Send
-    </label>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: white;">
+      <span>Auto-Send</span>
+      <label class="switch">
+        <input type="checkbox" id="autosendToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
 
   </div>
 </div>
