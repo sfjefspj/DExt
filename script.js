@@ -164,15 +164,20 @@ document.addEventListener('DOMContentLoaded', () => {
   
     const children = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
   
-    // Find the closest emoji horizontally based on mouse X position
-    let closestIndex = children.length; // Default to end
+    // Find the emoji closest to the mouse pointer (by Euclidean distance)
+    let closestIndex = 0;
     let closestDistance = Infinity;
   
     for (let i = 0; i < children.length; i++) {
       const rect = children[i].getBoundingClientRect();
-      // Calculate horizontal distance from mouse to center of emoji
+      // Calculate center coordinates of the emoji
       const emojiCenterX = rect.left + rect.width / 2;
-      const dist = Math.abs(e.clientX - emojiCenterX);
+      const emojiCenterY = rect.top + rect.height / 2;
+  
+      // Calculate distance from mouse to emoji center
+      const dx = e.clientX - emojiCenterX;
+      const dy = e.clientY - emojiCenterY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
   
       if (dist < closestDistance) {
         closestDistance = dist;
@@ -180,11 +185,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   
-    // Insert placeholder before or after closest emoji depending on mouse X relative to emoji center
     const closestEmoji = children[closestIndex];
     const rect = closestEmoji.getBoundingClientRect();
   
-    if (e.clientX < rect.left + rect.width / 2) {
+    // Decide whether to insert placeholder before or after based on mouse position relative to emoji center
+    const insertBefore = 
+      e.clientY < rect.top + rect.height / 2 || 
+      (e.clientY >= rect.top + rect.height / 2 && e.clientX < rect.left + rect.width / 2);
+  
+    if (insertBefore) {
       if (grid.children[closestIndex] !== placeholder) {
         grid.insertBefore(placeholder, closestEmoji);
       }
@@ -200,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
+
 
   // Drop event on grid to reorder emojis array and re-render
   grid.addEventListener('drop', (e) => {
