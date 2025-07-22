@@ -38,19 +38,30 @@ document.addEventListener('DOMContentLoaded', () => {
       div.appendChild(copiedMsg);
 
       div.onclick = () => {
-        navigator.clipboard.writeText(url).then(() => {
-          copiedMsg.classList.add('show');
-          setTimeout(() => copiedMsg.classList.remove('show'), 1000);
-        }).catch((err) => {
-          const success = fallbackCopyTextToClipboard(url);
-          if (success) {
+        const autoSend = document.getElementById('autosendToggle')?.checked;
+      
+        if (autoSend) {
+          // Post message to parent page
+          window.parent.postMessage({
+            type: 'insertEmojiUrl',
+            url: url
+          }, '*'); // You can restrict target origin if needed
+        } else {
+          navigator.clipboard.writeText(url).then(() => {
             copiedMsg.classList.add('show');
             setTimeout(() => copiedMsg.classList.remove('show'), 1000);
-          } else {
-            alert('Clipboard copy failed: ' + err + '\n\nCopy manually:\n' + url);
-          }
-        });
+          }).catch((err) => {
+            const success = fallbackCopyTextToClipboard(url);
+            if (success) {
+              copiedMsg.classList.add('show');
+              setTimeout(() => copiedMsg.classList.remove('show'), 1000);
+            } else {
+              alert('Clipboard copy failed: ' + err + '\n\nCopy manually:\n' + url);
+            }
+          });
+        }
       };
+
 
       div.oncontextmenu = (e) => {
         e.preventDefault();
