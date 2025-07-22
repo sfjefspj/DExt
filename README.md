@@ -6,39 +6,30 @@ A Chrome extension that injects a customizable emoji sidebar into Discord. Easil
 
 ## Installation Instructions
 
-1. **Download the ZIP**
-
+1. **Download the ZIP**  
    Download the zipped extension folder to your computer.
 
-2. **Unpack the ZIP**
+2. **Unpack the ZIP**  
+   Extract/unzip the downloaded file. You should get a folder containing all the extension files (`manifest.json`, `content.js`, `main.html`, icons, etc.).
 
-   Extract/unzip the downloaded file. You should end up with a folder that contains all the extension files (`manifest.json`, `content.js`, `main.html`, icons, etc.).
+3. **Open Chrome Extensions Page**  
+   Open Chrome and navigate to: `chrome://extensions/`
 
-3. **Open Chrome Extensions Page**
+4. **Enable Developer Mode**  
+   Toggle the **Developer mode** switch in the top-right corner of the page to ON.
 
-   Open Chrome and go to: `chrome://extensions/`
+5. **Load the Unpacked Extension**  
+   Click the **Load unpacked** button.
 
-4. **Enable Developer Mode**
+6. **Select the Extension Folder**  
+   In the dialog, select the **folder that contains the extension files directly** — **NOT** a folder containing another folder of files.  
+   This should be the bottom-level folder that has files like `manifest.json`, `content.js`, and `main.html` inside it.
 
-Toggle the **Developer mode** switch in the top-right corner of the page to ON.
+7. **Confirm the Extension Loads**  
+   After selecting the correct folder, the extension should appear enabled in your extensions list.
 
-5. **Load the Unpacked Extension**
-
-Click the **Load unpacked** button.
-
-6. **Select the Extension Folder**
-
-In the dialog, select the **folder that contains the extension files directly** — **NOT** a folder containing another folder of files.  
-
-It should be the bottom-most folder that contains files like `manifest.json`, `content.js`, and `main.html` directly.
-
-7. **Confirm the Extension Loads**
-
-After selecting the correct folder, the extension should appear enabled in your extensions list.
-
-8. **Reload Discord**
-
-Open Discord in Chrome (or reload the page if already open) to see the emoji sidebar injected.
+8. **Reload Discord**  
+   Open Discord in Chrome (or reload the page if it’s already open) to see the emoji sidebar injected.
 
 ---
 
