@@ -163,58 +163,43 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!placeholder) return;
   
     const children = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
-    if (children.length === 0) {
-      // If no emojis, just append placeholder
-      if (grid.firstChild !== placeholder) {
-        grid.appendChild(placeholder);
-      }
-      return;
-    }
   
-    // We'll find the closest gap to the mouse Y coordinate
+    // Find the closest emoji horizontally based on mouse X position
+    let closestIndex = children.length; // Default to end
     let closestDistance = Infinity;
-    let closestIndex = 0;
   
-    // For each gap between emojis (including before first and after last),
-    // compute vertical distance to mouse pointer, find minimum
-    for (let i = 0; i <= children.length; i++) {
-      let gapY;
-      if (i === 0) {
-        // Gap before first emoji
-        const rect = children[0].getBoundingClientRect();
-        gapY = rect.top;
-      } else if (i === children.length) {
-        // Gap after last emoji
-        const rect = children[children.length - 1].getBoundingClientRect();
-        gapY = rect.bottom;
-      } else {
-        // Gap between children[i-1] and children[i]
-        const rectPrev = children[i - 1].getBoundingClientRect();
-        const rectNext = children[i].getBoundingClientRect();
-        gapY = (rectPrev.bottom + rectNext.top) / 2;
-      }
+    for (let i = 0; i < children.length; i++) {
+      const rect = children[i].getBoundingClientRect();
+      // Calculate horizontal distance from mouse to center of emoji
+      const emojiCenterX = rect.left + rect.width / 2;
+      const dist = Math.abs(e.clientX - emojiCenterX);
   
-      const distance = Math.abs(e.clientY - gapY);
-      if (distance < closestDistance) {
-        closestDistance = distance;
+      if (dist < closestDistance) {
+        closestDistance = dist;
         closestIndex = i;
       }
     }
   
-    // Insert placeholder at the closest gap position
-    if (closestIndex === children.length) {
-      // After last emoji
-      if (grid.lastChild !== placeholder) {
-        grid.appendChild(placeholder);
+    // Insert placeholder before or after closest emoji depending on mouse X relative to emoji center
+    const closestEmoji = children[closestIndex];
+    const rect = closestEmoji.getBoundingClientRect();
+  
+    if (e.clientX < rect.left + rect.width / 2) {
+      if (grid.children[closestIndex] !== placeholder) {
+        grid.insertBefore(placeholder, closestEmoji);
       }
     } else {
-      // Before emoji at closestIndex
-      if (children[closestIndex] !== placeholder.nextSibling) {
-        grid.insertBefore(placeholder, children[closestIndex]);
+      if (closestIndex + 1 < grid.children.length) {
+        if (grid.children[closestIndex + 1] !== placeholder) {
+          grid.insertBefore(placeholder, closestEmoji.nextSibling);
+        }
+      } else {
+        if (grid.lastChild !== placeholder) {
+          grid.appendChild(placeholder);
+        }
       }
     }
   });
-
 
   // Drop event on grid to reorder emojis array and re-render
   grid.addEventListener('drop', (e) => {
