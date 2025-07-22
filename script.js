@@ -162,26 +162,56 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     if (!placeholder) return;
   
-    const allChildren = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
+    const children = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
+    if (children.length === 0) {
+      // If no emojis, just append placeholder
+      if (grid.firstChild !== placeholder) {
+        grid.appendChild(placeholder);
+      }
+      return;
+    }
   
-    // Find where to insert placeholder based on mouse Y position
-    let insertBeforeNode = null;
+    // We'll find the closest gap to the mouse Y coordinate
+    let closestDistance = Infinity;
+    let closestIndex = 0;
   
-    for (const child of allChildren) {
-      const rect = child.getBoundingClientRect();
-      const midpoint = rect.top + rect.height / 2;
-      if (e.clientY < midpoint) {
-        insertBeforeNode = child;
-        break;
+    // For each gap between emojis (including before first and after last),
+    // compute vertical distance to mouse pointer, find minimum
+    for (let i = 0; i <= children.length; i++) {
+      let gapY;
+      if (i === 0) {
+        // Gap before first emoji
+        const rect = children[0].getBoundingClientRect();
+        gapY = rect.top;
+      } else if (i === children.length) {
+        // Gap after last emoji
+        const rect = children[children.length - 1].getBoundingClientRect();
+        gapY = rect.bottom;
+      } else {
+        // Gap between children[i-1] and children[i]
+        const rectPrev = children[i - 1].getBoundingClientRect();
+        const rectNext = children[i].getBoundingClientRect();
+        gapY = (rectPrev.bottom + rectNext.top) / 2;
+      }
+  
+      const distance = Math.abs(e.clientY - gapY);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = i;
       }
     }
   
-    if (insertBeforeNode) {
-      if (placeholder.nextSibling !== insertBeforeNode) {
-        grid.insertBefore(placeholder, insertBeforeNode);
+    // Insert placeholder at the closest gap position
+    if (closestIndex === children.length) {
+      // After last emoji
+      if (grid.lastChild !== placeholder) {
+        grid.appendChild(placeholder);
       }
     } else {
-      grid.appendChild(placeholder);
+      // Before emoji at closestIndex
+      if (children[closestIndex] !== placeholder.nextSibling) {
+        grid.insertBefore(placeholder, children[closestIndex]);
+      }
     }
   });
 
