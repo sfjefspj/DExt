@@ -158,21 +158,19 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('emojiList', JSON.stringify(emojis));
   }
 
-  // Dragover event on grid to move placeholder depending on mouse position
   grid.addEventListener('dragover', (e) => {
     e.preventDefault();
     if (!placeholder) return;
   
-    const mouseY = e.clientY;
     const allChildren = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
   
+    // Find where to insert placeholder based on mouse Y position
     let insertBeforeNode = null;
   
-    for (let i = 0; i < allChildren.length; i++) {
-      const child = allChildren[i];
+    for (const child of allChildren) {
       const rect = child.getBoundingClientRect();
-  
-      if (mouseY < rect.top + rect.height / 2) {
+      const midpoint = rect.top + rect.height / 2;
+      if (e.clientY < midpoint) {
         insertBeforeNode = child;
         break;
       }
@@ -186,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.appendChild(placeholder);
     }
   });
+
 
   // Drop event on grid to reorder emojis array and re-render
   grid.addEventListener('drop', (e) => {
