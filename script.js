@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  
   function renderEmojis(filter = '') {
     grid.innerHTML = '';
     const filtered = emojis.filter(({ title }) =>
@@ -46,51 +45,48 @@ document.addEventListener('DOMContentLoaded', () => {
       copiedMsg.className = 'copied-message';
       copiedMsg.innerText = 'Copied!';
 
-      
       div.appendChild(img);
       div.appendChild(tooltip);
       div.appendChild(copiedMsg);
 
       div.draggable = true;
-      
+
       div.addEventListener('dragstart', (e) => {
         dragSrcIndex = index;
         e.dataTransfer.effectAllowed = 'move';
-        // Create a transparent drag image to avoid default ghost
+        // Transparent drag image to avoid default ghost
         const crt = document.createElement('canvas');
         crt.width = crt.height = 0;
         e.dataTransfer.setDragImage(crt, 0, 0);
-      
+
         // Create and insert placeholder
         placeholder = document.createElement('div');
         placeholder.className = 'emoji placeholder';
         placeholder.style.height = div.offsetHeight + 'px';
         grid.insertBefore(placeholder, div.nextSibling);
-      
+
         div.classList.add('dragging');
       });
-      
-      div.addEventListener('dragend', (e) => {
+
+      div.addEventListener('dragend', () => {
         if (placeholder) placeholder.remove();
         placeholder = null;
-      
+
         div.classList.remove('dragging');
-      
-        // If dragSrcIndex changed, save emojis
-        if (dragSrcIndex !== null) {
-          localStorage.setItem('emojiList', JSON.stringify(emojis));
-        }
+
+        // Save after drag end (emojis array updated on drop)
+        localStorage.setItem('emojiList', JSON.stringify(emojis));
         dragSrcIndex = null;
       });
-      
+
       div.addEventListener('dragover', (e) => {
         e.preventDefault();
         if (!placeholder) return;
         const bounding = div.getBoundingClientRect();
         const offset = e.clientY - bounding.top;
-      
+
         const insertBefore = offset < bounding.height / 2;
-      
+
         if (insertBefore) {
           if (grid.contains(placeholder) && placeholder.nextSibling !== div) {
             grid.insertBefore(placeholder, div);
@@ -101,35 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
-      
-      grid.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (dragSrcIndex === null || !placeholder) return;
-      
-        const newChildren = Array.from(grid.children).filter(c => !c.classList.contains('placeholder'));
-        const newIndex = newChildren.indexOf(placeholder);
-      
-        // Remove dragged emoji and insert at new index
-        const moved = emojis.splice(dragSrcIndex, 1)[0];
-        emojis.splice(newIndex, 0, moved);
-      
-        dragSrcIndex = null;
-        placeholder.remove();
-        placeholder = null;
-      
-        renderEmojis(searchInput.value);
-      });
 
-      
       div.onclick = () => {
         const autoSend = autosendEnabled;
-      
+
         if (autoSend) {
-          // Post message to parent page
           window.parent.postMessage({
             type: 'insertEmojiUrl',
             url: url
-          }, '*'); // You can restrict target origin if needed
+          }, '*');
         } else {
           navigator.clipboard.writeText(url).then(() => {
             copiedMsg.classList.add('show');
@@ -145,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
       };
-
 
       div.oncontextmenu = (e) => {
         e.preventDefault();
@@ -198,8 +173,43 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.appendChild(div);
     });
 
+    // Save emojis every time you render
     localStorage.setItem('emojiList', JSON.stringify(emojis));
   }
+
+  // NEW: Single drop listener outside render loop
+  grid.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (dragSrcIndex === null || !placeholder) return;
+
+    // All children including placeholder
+    const allChildren = Array.from(grid.children);
+    // Emoji elements without placeholder
+    const emojiElements = allChildren.filter(el => !el.classList.contains('placeholder'));
+
+    // placeholder index among all children
+    const placeholderIndex = allChildren.indexOf(placeholder);
+
+    // Calculate new index in emojis array based on placeholder position
+    let newIndex = 0;
+    for (let i = 0; i < emojiElements.length; i++) {
+      if (allChildren.indexOf(emojiElements[i]) < placeholderIndex) {
+        newIndex++;
+      } else {
+        break;
+      }
+    }
+
+    // Reorder emojis array
+    const movedEmoji = emojis.splice(dragSrcIndex, 1)[0];
+    emojis.splice(newIndex, 0, movedEmoji);
+
+    dragSrcIndex = null;
+    placeholder.remove();
+    placeholder = null;
+
+    renderEmojis(searchInput.value);
+  });
 
   document.addEventListener('click', (e) => {
     if (contextMenuDiv && !contextMenuDiv.contains(e.target)) {
@@ -264,41 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     reader.readAsText(file);
   }
-
-  grid.addEventListener('drop', (e) => {
-    e.preventDefault();
-    if (dragSrcIndex === null || !placeholder) return;
-  
-    // Get array of emoji elements excluding the placeholder
-    const emojiElements = Array.from(grid.children).filter(el => !el.classList.contains('placeholder'));
-  
-    // Find placeholder's position in grid.children
-    const allChildren = Array.from(grid.children);
-    const placeholderIndex = allChildren.indexOf(placeholder);
-  
-    // Calculate new index in emojis array for insertion:
-    let newIndex = 0;
-    for (let i = 0; i < emojiElements.length; i++) {
-      if (allChildren.indexOf(emojiElements[i]) < placeholderIndex) {
-        newIndex++;
-      } else {
-        break;
-      }
-    }
-  
-    // Remove the dragged emoji from old position and insert at new index
-    const movedEmoji = emojis.splice(dragSrcIndex, 1)[0];
-    emojis.splice(newIndex, 0, movedEmoji);
-  
-    // Cleanup drag state
-    dragSrcIndex = null;
-    placeholder.remove();
-    placeholder = null;
-  
-    // Re-render emojis in new order (this also saves to localStorage)
-    renderEmojis(searchInput.value);
-  });
-
 
   document.getElementById('addBtn').addEventListener('click', addEmoji);
   document.getElementById('exportBtn').addEventListener('click', exportData);
