@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('emojiGrid');
   const searchInput = document.getElementById('searchInput');
   let emojis = JSON.parse(localStorage.getItem('emojiList') || '[]');
+  let autosendEnabled = localStorage.getItem('autosendEnabled') === 'true';
   let contextMenuDiv = null;
 
   function closeContextMenu() {
@@ -11,6 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  const autosendToggle = document.getElementById('autosendToggle');
+  if (autosendToggle) {
+    autosendToggle.checked = autosendEnabled;
+    autosendToggle.addEventListener('change', () => {
+      autosendEnabled = autosendToggle.checked;
+      localStorage.setItem('autosendEnabled', autosendEnabled);
+    });
+  }
+
+  
   function renderEmojis(filter = '') {
     grid.innerHTML = '';
     const filtered = emojis.filter(({ title }) =>
@@ -33,12 +44,39 @@ document.addEventListener('DOMContentLoaded', () => {
       copiedMsg.className = 'copied-message';
       copiedMsg.innerText = 'Copied!';
 
+      
       div.appendChild(img);
       div.appendChild(tooltip);
       div.appendChild(copiedMsg);
 
+      div.draggable = true;
+      
+      div.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', index);
+        e.currentTarget.classList.add('dragging');
+      });
+      
+      div.addEventListener('dragend', (e) => {
+        e.currentTarget.classList.remove('dragging');
+      });
+      
+      div.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const draggingElem = document.querySelector('.dragging');
+        if (draggingElem && draggingElem !== div) {
+          const fromIndex = +e.dataTransfer.getData('text/plain');
+          const toIndex = index;
+          if (fromIndex !== toIndex) {
+            const moved = emojis.splice(fromIndex, 1)[0];
+            emojis.splice(toIndex, 0, moved);
+            renderEmojis(searchInput.value);
+          }
+        }
+      });
+
+      
       div.onclick = () => {
-        const autoSend = document.getElementById('autosendToggle')?.checked;
+        const autoSend = autosendEnabled;
       
         if (autoSend) {
           // Post message to parent page
